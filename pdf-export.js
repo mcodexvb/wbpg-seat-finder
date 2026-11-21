@@ -10,7 +10,7 @@ function pdfBuild(title,columns,records,summary){
  const catalog=add(""),root=add(""),font=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
  const bold=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
  const pageIds=[];
- const e=s=>ascii(s).slice(0,240);
+ const e=s=>ascii(s).replace(/\\/g,"/").slice(0,240);
  function logo(x,y,scale,watermark=false){
   let t="q\n"+(watermark?"/GS1 gs\n":"")+scale+" 0 0 "+scale+" "+x+" "+y+" cm\n";
   t+="0.043 0.294 0.439 rg 0 0 64 64 re f\n";
@@ -49,7 +49,7 @@ function pdfBuild(title,columns,records,summary){
   stream+=line(left,43,right,43);
   stream+=txt(left,27,"Made by Mainul  |  mainul.pages.dev",9);
   stream+=txt(745,27,"Page "+(p+1)+" / "+pages.length,9);
-  const streamId=add("<< /Length "+new TextEncoder().encode(stream).length+" >>\nstream\n"+stream+"\nendstream");
+  const streamId=add("<< /Length "+new TextEncoder().encode(stream+"\n").length+" >>\nstream\n"+stream+"\nendstream");
   const page=add("<< /Type /Page /Parent "+root+" 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> /ExtGState << /GS1 << /Type /ExtGState /ca 0.08 >> >> >> /Contents "+streamId+" 0 R >>");
   pageIds.push(page);
  });
