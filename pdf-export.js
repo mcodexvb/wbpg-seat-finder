@@ -60,15 +60,14 @@ function pdfBuild(title,columns,records,summary){
  output+="trailer\n<< /Size "+objects.length+" /Root "+catalog+" 0 R >>\nstartxref\n"+start+"\n%%EOF";
  return new Blob([output],{type:"application/pdf"});
 }
-let previewUrl;
-function preview(blob,name){
- if(previewUrl)URL.revokeObjectURL(previewUrl);
- previewUrl=URL.createObjectURL(blob);
- let modal=document.getElementById("wbpg-pdf-modal");
- if(!modal){modal=document.createElement("dialog");modal.id="wbpg-pdf-modal";modal.className="pdf-dialog";modal.innerHTML='<div class="pdf-head"><strong>PDF preview</strong><div><a id="wbpg-pdf-download" class="pdf-download">Download PDF</a><button type="button" id="wbpg-pdf-close">Close</button></div></div><iframe title="PDF preview"></iframe>';document.body.append(modal);modal.querySelector("#wbpg-pdf-close").onclick=()=>modal.close();modal.addEventListener("close",()=>{modal.querySelector("iframe").src="about:blank"});}
- const a=modal.querySelector("a");a.href=previewUrl;a.download=name;
- modal.querySelector("iframe").src=previewUrl;
- if(!modal.open)modal.showModal();
+function download(blob,name){
+ const url=URL.createObjectURL(blob);
+ const anchor=document.createElement("a");
+ anchor.href=url;anchor.download=name||"wbpg-report.pdf";
+ anchor.style.display="none";
+ document.body.append(anchor);
+ anchor.click();anchor.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
-window.WBPG_PDF={build:pdfBuild,preview};
+window.WBPG_PDF={build:pdfBuild,download,preview:download};
 })();
