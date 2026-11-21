@@ -34,8 +34,6 @@ function pdfBuild(title,columns,records,summary){
   stream+=txt(93,536,"WB PG Seat Finder  |  2026 Round 2",10);
   stream+=txt(35,494,summary,9);
   stream+=txt(35,480,"Source: WBMCC 2026 Round 2 matrix  |  Verify official counselling notices",8);
-  stream+=logo(345,180,3.25,true);
-  stream+=txt(332,165,"WB PG SEAT FINDER",27,"F2","0.92 0.94 0.96 rg");
   let x=left;
   columns.forEach((c,i)=>{stream+=txt(x+3,443,c.name,9,"F2");x+=widths[i]});
   stream+=line(left,435,right,435);
@@ -47,7 +45,7 @@ function pdfBuild(title,columns,records,summary){
    stream+=line(left,y-9,right,y-9);
   });
   stream+=line(left,43,right,43);
-  stream+=txt(left,27,"Made by Mainul  |  mainul.pages.dev",9);
+  stream+=txt(left,27,"Made by Mainul",9);
   stream+=txt(745,27,"Page "+(p+1)+" / "+pages.length,9);
   const streamId=add("<< /Length "+new TextEncoder().encode(stream+"\n").length+" >>\nstream\n"+stream+"\nendstream");
   const page=add("<< /Type /Page /Parent "+root+" 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> /ExtGState << /GS1 << /Type /ExtGState /ca 0.08 >> >> >> /Contents "+streamId+" 0 R >>");
