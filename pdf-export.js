@@ -11,6 +11,17 @@ function pdfBuild(title,columns,records,summary){
  const bold=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
  const pageIds=[];
  const e=s=>ascii(s).slice(0,240);
+ function logo(x,y,scale,watermark=false){
+  let t="q\n"+(watermark?"/GS1 gs\n":"")+scale+" 0 0 "+scale+" "+x+" "+y+" cm\n";
+  t+="0.043 0.294 0.439 rg 0 0 64 64 re f\n";
+  t+="1 1 1 rg 15 10 34 39 re f\n";
+  t+="0.196 0.698 0.671 RG 4 w 26 49 m 26 53 l 38 53 l 38 49 l S\n";
+  t+="0.027 0.612 0.569 RG 3 w 21 38 m 25 34 l 32 42 l S\n";
+  t+="21 24 m 25 20 l 32 28 l S\n";
+  t+="0.443 0.596 0.659 RG 2 w 37 37 m 44 37 l S\n37 23 m 44 23 l S\nQ\n";
+  return t;
+ }
+ 
  function txt(x,y,s,size=10,face="F1",color="0.10 0.22 0.34 rg"){
   return color+"\nBT /"+face+" "+size+" Tf 1 0 0 1 "+x+" "+y+" Tm ("+e(s)+") Tj ET\n";
  }
@@ -18,14 +29,13 @@ function pdfBuild(title,columns,records,summary){
  pages.forEach((set,p)=>{
   let stream="q\n1 1 1 rg 0 0 "+W+" "+H+" re f\nQ\n";
   stream+="q 0.95 0.97 0.985 rg 0 510 842 85 re f Q\n";
-  stream+="q 0.07 0.38 0.50 rg 35 529 45 45 re f Q\n";
-  stream+=txt(44,547,"PG",21,"F2","1 1 1 rg");
+  stream+=logo(35,529,0.703125);
   stream+=txt(93,557,title,18,"F2");
   stream+=txt(93,536,"WB PG Seat Finder  |  2026 Round 2",10);
   stream+=txt(35,494,summary,9);
   stream+=txt(35,480,"Source: WBMCC 2026 Round 2 matrix  |  Verify official counselling notices",8);
-  stream+="q /GS1 gs 0.92 0.95 0.97 rg 260 177 325 210 re f Q\n";
-  stream+=txt(315,267,"WB PG",74,"F2","0.92 0.94 0.96 rg");
+  stream+=logo(345,180,3.25,true);
+  stream+=txt(332,165,"WB PG SEAT FINDER",27,"F2","0.92 0.94 0.96 rg");
   let x=left;
   columns.forEach((c,i)=>{stream+=txt(x+3,443,c.name,9,"F2");x+=widths[i]});
   stream+=line(left,435,right,435);
@@ -40,7 +50,7 @@ function pdfBuild(title,columns,records,summary){
   stream+=txt(left,27,"Made by Mainul  |  mainul.pages.dev",9);
   stream+=txt(745,27,"Page "+(p+1)+" / "+pages.length,9);
   const streamId=add("<< /Length "+new TextEncoder().encode(stream).length+" >>\nstream\n"+stream+"\nendstream");
-  const page=add("<< /Type /Page /Parent "+root+" 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> /ExtGState << /GS1 << /Type /ExtGState /ca 0.3 >> >> >> /Contents "+streamId+" 0 R >>");
+  const page=add("<< /Type /Page /Parent "+root+" 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> /ExtGState << /GS1 << /Type /ExtGState /ca 0.08 >> >> >> /Contents "+streamId+" 0 R >>");
   pageIds.push(page);
  });
  objects[root]="<< /Type /Pages /Count "+pageIds.length+" /Kids ["+pageIds.map(id=>id+" 0 R").join(" ")+"] >>";
