@@ -19,12 +19,12 @@ const subject=$("rankSubject"),rank=$("rankInput"),category=$("rankCategory"),pw
 function mappedSubject(r){return Object.keys(specialtyMatch).find(n=>specialtyMatch[n].test(r.program||r.subject||""))||r.subject;}
 function isRegular(r){return ["MD","MS","MD/MS"].includes(r.degree)}
 function isEligibleCategory(r){
- if(pwd.checked)return (r.category.reduce((n,v)=>n+v,0)>0);
+ if(pwd.checked)return ["UR PwD",...(category.value==="UR"?[]:[category.value+" PwD"])].some(c=>r.category[cats.indexOf(c)]>0);
  const allowed=category.value==="UR"?["UR"]:["UR",category.value];
  return allowed.some(c=>r.category[cats.indexOf(c)]>0);
 }
 function countEligible(r){
- if(pwd.checked)return r.seats;
+ if(pwd.checked)return ["UR PwD",...(category.value==="UR"?[]:[category.value+" PwD"])].reduce((n,c)=>n+(r.category[cats.indexOf(c)]||0),0);
  return (category.value==="UR"?["UR"]:["UR",category.value]).reduce((n,c)=>n+(r.category[cats.indexOf(c)]||0),0);
 }
 function historyMatch(r){
@@ -51,7 +51,7 @@ function run(){
  const more=histCategory.filter(r=>r.rank>=rnk);
  const before=histCategory.filter(r=>r.rank<rnk);
  const maxRank=histCategory.length?Math.max(...histCategory.map(x=>x.rank)):null;
- const rowHtml=compatible.sort((a,b)=>countEligible(b)-countEligible(a)).map(r=>'<tr><td>'+esc(r.college)+'</td><td>'+esc(r.degree)+'</td><td>'+esc(r.quota)+'</td><td>'+cats.map((c,i)=>!pwd.checked && (c==="UR"||c===category.value)&&r.category[i]?esc(c)+': '+r.category[i]:pwd.checked&&r.category[i]?esc(c)+': '+r.category[i]:"").filter(Boolean).join(", ")+'</td><td>'+countEligible(r)+'</td><td>'+r.page+'</td></tr>').join("");
+ const rowHtml=compatible.sort((a,b)=>countEligible(b)-countEligible(a)).map(r=>'<tr><td>'+esc(r.college)+'</td><td>'+esc(r.degree)+'</td><td>'+esc(r.quota)+'</td><td>'+cats.map((c,i)=>!pwd.checked && (c==="UR"||c===category.value)&&r.category[i]?esc(c)+': '+r.category[i]:pwd.checked&&["UR PwD",category.value+" PwD"].includes(c)&&r.category[i]?esc(c)+': '+r.category[i]:"").filter(Boolean).join(", ")+'</td><td>'+countEligible(r)+'</td><td>'+r.page+'</td></tr>').join("");
  const examples=histCategory.sort((a,b)=>Math.abs(a.rank-rnk)-Math.abs(b.rank-rnk)).slice(0,7).map(r=>'<tr><td>'+fmt(r.rank)+'</td><td>'+esc(r.subject)+'</td><td>'+esc(r.category)+'</td><td>'+esc(r.page)+'</td></tr>').join("");
  const candidate=verified.find(x=>x.rank===rnk);
  $("rankResults").innerHTML=
